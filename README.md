@@ -1,15 +1,25 @@
-# Code Review Assistant
+# Context-Aware Code Reviewer
 
-An AI-powered code review tool that provides automated feedback on code quality.
+An autonomous code review assistant that uses AI to provide context-aware feedback and suggestions.
 
 ## Overview
 
-This project aims to create an automated code review assistant.
+This project aims to create an automated code review assistant using modern AI techniques.
 
 ## Installation
 
-TODO: Add installation instructions
+```bash
+pip install -r requirements.txt
+```
 
 ## Usage
 
-TODO: Add usage instructions
+Run the API server:
+```bash
+uvicorn src.review_assistant.api:app --reload
+```
+
+## API Endpoints
+
+- `GET /` - Health check
+- `POST /review` - Submit code for review
