@@ -19,6 +19,7 @@ ENV/
 .coverage
 htmlcov/
 .pytest_cache/
+.tox/
 
 # Distribution
 dist/
@@ -28,3 +29,13 @@ build/
 # Environment
 .env
 *.log
+
+# Database
+*.db
+*.sqlite
+*.faiss
+vector_store.faiss
+
+# Temporary files
+*.tmp
+temp_*
