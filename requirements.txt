@@ -7,4 +7,11 @@ langchain-community
 langchain-openai
 faiss-cpu==1.8.0
 tiktoken
+fastapi
+uvicorn
+pydantic
+python-dotenv
+numpy<2
+cmake
 pytest
+python-multipart
