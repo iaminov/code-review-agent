@@ -9,11 +9,23 @@ class VectorStore:
     """A wrapper for FAISS vector store operations."""
 
     def __init__(self, index_path: str | os.PathLike):
+        """
+        Initializes the VectorStore.
+
+        Args:
+            index_path: The path to the FAISS index file.
+        """
         self.index_path = Path(index_path)
         self.embeddings = OpenAIEmbeddings()
         self.index = self._load_index()
 
     def _load_index(self) -> FAISS:
+        """
+        Loads the FAISS index from the specified path, or creates a new one.
+
+        Returns:
+            A FAISS vector store instance.
+        """
         if self.index_path.exists():
             return FAISS.load_local(str(self.index_path), self.embeddings, allow_dangerous_deserialization=True)
         
@@ -30,6 +42,13 @@ class VectorStore:
         )
 
     def add_texts(self, texts: list[str], metadatas: list[dict] | None = None):
+        """
+        Adds texts to the vector store.
+
+        Args:
+            texts: A list of texts to add.
+            metadatas: Optional list of metadata dictionaries corresponding to the texts.
+        """
         self.index.add_texts(texts=texts, metadatas=metadatas)
 
     def save_index(self):
