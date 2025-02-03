@@ -33,4 +33,14 @@ class VectorStore:
         self.index.add_texts(texts=texts, metadatas=metadatas)
 
     def save_index(self):
+        """Saves the FAISS index to the specified path."""
         self.index.save_local(str(self.index_path))
+
+    def as_retriever(self):
+        """
+        Returns the vector store as a LangChain retriever.
+
+        Returns:
+            A LangChain retriever instance.
+        """
+        return self.index.as_retriever()
