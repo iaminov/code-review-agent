@@ -15,7 +15,7 @@ class VectorStore:
 
     def _load_index(self) -> FAISS:
         if self.index_path.exists():
-            return FAISS.load_local(str(self.index_path), self.embeddings)
+            return FAISS.load_local(str(self.index_path), self.embeddings, allow_dangerous_deserialization=True)
         
         # Create a new index if it doesn't exist
         embedding_dimension = len(self.embeddings.embed_query("test"))
