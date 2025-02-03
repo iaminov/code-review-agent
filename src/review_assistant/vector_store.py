@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 import faiss
 from langchain_openai import OpenAIEmbeddings
+from langchain_community.docstore.in_memory import InMemoryDocstore
 from langchain_community.vectorstores import FAISS
 
 class VectorStore:
@@ -19,11 +20,13 @@ class VectorStore:
         # Create a new index if it doesn't exist
         embedding_dimension = len(self.embeddings.embed_query("test"))
         dummy_index = faiss.IndexFlatL2(embedding_dimension)
+        dummy_docstore = InMemoryDocstore({})
         
-        # But still has issue - missing docstore
         return FAISS(
             embedding_function=self.embeddings,
-            index=dummy_index
+            index=dummy_index,
+            docstore=dummy_docstore,
+            index_to_docstore_id={}
         )
 
     def add_texts(self, texts: list[str], metadatas: list[dict] | None = None):
