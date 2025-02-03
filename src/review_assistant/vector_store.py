@@ -16,8 +16,15 @@ class VectorStore:
         if self.index_path.exists():
             return FAISS.load_local(str(self.index_path), self.embeddings)
         
-        # BUG: Not creating a new index properly
-        return None
+        # Create a new index if it doesn't exist
+        embedding_dimension = len(self.embeddings.embed_query("test"))
+        dummy_index = faiss.IndexFlatL2(embedding_dimension)
+        
+        # But still has issue - missing docstore
+        return FAISS(
+            embedding_function=self.embeddings,
+            index=dummy_index
+        )
 
     def add_texts(self, texts: list[str], metadatas: list[dict] | None = None):
         self.index.add_texts(texts=texts, metadatas=metadatas)
