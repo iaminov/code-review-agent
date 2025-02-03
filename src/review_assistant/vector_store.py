@@ -4,6 +4,23 @@ import faiss
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.docstore.in_memory import InMemoryDocstore
 from langchain_community.vectorstores import FAISS
+from langchain_core.embeddings import Embeddings
+
+class _EmbeddingAdapter(Embeddings):
+    """Adapter to ensure FAISS receives a proper Embeddings object even when mocked."""
+    def __init__(self, impl):
+        self._impl = impl
+
+    def embed_documents(self, texts):
+        if hasattr(self._impl, "embed_documents"):
+            return self._impl.embed_documents(texts)
+        # Fallback: derive document embeddings from embed_query when necessary
+        return [self._impl.embed_query(t) for t in texts]
+
+    def embed_query(self, text):
+        if hasattr(self._impl, "embed_query"):
+            return self._impl.embed_query(text)
+        raise NotImplementedError("embed_query not available on wrapped implementation")
 
 class VectorStore:
     """A wrapper for FAISS vector store operations."""
@@ -17,6 +34,7 @@ class VectorStore:
         """
         self.index_path = Path(index_path)
         self.embeddings = OpenAIEmbeddings()
+        self._embedding = _EmbeddingAdapter(self.embeddings)
         self.index = self._load_index()
 
     def _load_index(self) -> FAISS:
@@ -27,18 +45,17 @@ class VectorStore:
             A FAISS vector store instance.
         """
         if self.index_path.exists():
-            return FAISS.load_local(str(self.index_path), self.embeddings, allow_dangerous_deserialization=True)
+            return FAISS.load_local(str(self.index_path), self._embedding, allow_dangerous_deserialization=True)
         
-        # Create a new index if it doesn't exist
-        embedding_dimension = len(self.embeddings.embed_query("test"))
+        embedding_dimension = len(self._embedding.embed_query("test"))
         dummy_index = faiss.IndexFlatL2(embedding_dimension)
         dummy_docstore = InMemoryDocstore({})
         
         return FAISS(
-            embedding_function=self.embeddings,
+            embedding_function=self._embedding,
             index=dummy_index,
             docstore=dummy_docstore,
-            index_to_docstore_id={}
+            index_to_docstore_id={},
         )
 
     def add_texts(self, texts: list[str], metadatas: list[dict] | None = None):
