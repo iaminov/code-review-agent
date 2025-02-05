@@ -21,6 +21,12 @@ class Ingestor:
         )
 
     def ingest_file(self, file_path: str | os.PathLike):
+        """
+        Reads, chunks, and embeds a single file.
+
+        Args:
+            file_path: The path to the file to ingest.
+        """
         path = Path(file_path)
         try:
             with open(path, "r", encoding="utf-8") as f:
@@ -29,5 +35,11 @@ class Ingestor:
             print(f"Error reading file {path}: {e}")
             return
 
-        # BUG: Not chunking text properly
-        self.vector_store.add_texts([content])
+        documents = self.text_splitter.create_documents([content])
+        for doc in documents:
+            doc.metadata["source"] = str(path.as_posix())
+
+        self.vector_store.add_texts(
+            texts=[doc.page_content for doc in documents],
+            metadatas=[doc.metadata for doc in documents],
+        )
