@@ -43,3 +43,17 @@ class Ingestor:
             texts=[doc.page_content for doc in documents],
             metadatas=[doc.metadata for doc in documents],
         )
+
+    def ingest_directory(self, directory_path: str | os.PathLike):
+        """
+        Recursively ingests all supported file types in a directory.
+
+        Args:
+            directory_path: The path to the directory to ingest.
+        """
+        path = Path(directory_path)
+        for item in path.rglob("*"):
+            if item.is_file():
+                self.ingest_file(item)
+
+        self.vector_store.save_index()
