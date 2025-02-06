@@ -3,6 +3,7 @@ from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
 from langchain_openai import ChatOpenAI
 from review_assistant.vector_store import VectorStore
+from langchain_core.runnables import RunnablePassthrough, RunnableLambda
 
 class RAGChain:
     """
@@ -56,10 +57,17 @@ class RAGChain:
         if self.llm is None:
             self.llm = ChatOpenAI(model="gpt-4o", api_key=self.api_key)
 
+        # Ensure we call .invoke when available (works with MagicMock in tests)
+        llm_runnable = (
+            RunnableLambda(lambda x: self.llm.invoke(x))
+            if hasattr(self.llm, "invoke")
+            else self.llm
+        )
+
         return (
             {"context": self.retriever, "code": RunnablePassthrough()}
             | self.prompt_template
-            | self.llm
+            | llm_runnable
             | StrOutputParser()
         )
 
