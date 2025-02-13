@@ -8,12 +8,9 @@ from review_assistant.vector_store import VectorStore
 @pytest.fixture
 def temp_index_path():
     """Create a temporary path for the index."""
-    with tempfile.NamedTemporaryFile(suffix=".faiss", delete=False) as f:
-        path = Path(f.name)
-    yield path
-    # Cleanup
-    if path.exists():
-        path.unlink()
+    with tempfile.TemporaryDirectory() as tmpdir:
+        path = Path(tmpdir) / "test_index.faiss"
+        yield path
 
 def test_vector_store_initialization(temp_index_path):
     """Test that VectorStore initializes correctly."""

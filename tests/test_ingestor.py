@@ -15,8 +15,8 @@ def test_ingestor_initialization(mock_vector_store):
     ingestor = Ingestor(mock_vector_store)
     assert ingestor.vector_store == mock_vector_store
     assert ingestor.text_splitter is not None
-    assert ingestor.text_splitter.chunk_size == 1000
-    assert ingestor.text_splitter.chunk_overlap == 200
+    assert ingestor.text_splitter._chunk_size == 1000
+    assert ingestor.text_splitter._chunk_overlap == 200
 
 def test_ingest_file_success(mock_vector_store):
     """Test successful file ingestion."""
