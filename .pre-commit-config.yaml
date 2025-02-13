@@ -1,0 +1,16 @@
+repos:
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.1.1
+    hooks:
+      - id: flake8
+        args:
+          - --max-line-length=127
+          - --max-complexity=10
+  - repo: local
+    hooks:
+      - id: ci-run
+        name: run CI checks (flake8 + pytest)
+        entry: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run_ci_locally.ps1
+        language: system
+        pass_filenames: false
+        stages: [push]
