@@ -46,11 +46,11 @@ class VectorStore:
         """
         if self.index_path.exists():
             return FAISS.load_local(str(self.index_path), self._embedding, allow_dangerous_deserialization=True)
-        
+
         embedding_dimension = len(self._embedding.embed_query("test"))
         dummy_index = faiss.IndexFlatL2(embedding_dimension)
         dummy_docstore = InMemoryDocstore({})
-        
+
         return FAISS(
             embedding_function=self._embedding,
             index=dummy_index,
